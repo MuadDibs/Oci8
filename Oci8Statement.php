@@ -59,7 +59,7 @@ class Oci8Statement extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-bind-by-name.php
    */
-  public function bindByName($bvName, &$variable, $maxLength = -1, $type = SQLT_CHR)
+  public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR)
     {
     set_error_handler(static::getErrorHandler());
     $isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
