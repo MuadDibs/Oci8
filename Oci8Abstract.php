@@ -6,13 +6,46 @@ abstract class Oci8Abstract
   {
   protected static $errorHandler;
   
-  public function getError()
+  public function getError($handle = null): array
     {
-    set_error_handler($this->getErrorHandler());
-    $error = oci_error($this->resource);
-    restore_error_handler();
+    $error = is_resource($handle) ? oci_error($handle) : oci_error();
+    if (!$error)
+      {
+      $error = error_get_last();
+      }
+    $error = error_get_last();
     return $error;
     }
+  
+  protected function throwExceptionIfFalse($result, $resource = null)
+    {
+    if (false === $result || $result === null)
+      {
+      $error = $this->getError($resource);
+      throw new Oci8Exception($error);
+      }
+    }
+  
+  /*
+  protected function throwExceptionIfFalse($result, $handle = null)
+    {
+    if (false === $result || $result === null)
+      {
+      $error = $this->getError($handle);
+      throw new Oci8Exception($error);
+      }
+    
+    return $this;
+    }
+  */
+  /*
+    public function getError()
+      {
+      set_error_handler($this->getErrorHandler());
+      $error = oci_error($this->resource);
+      restore_error_handler();
+      return $error;
+      }*/
   
   /**
    * @return callable
@@ -34,8 +67,7 @@ abstract class Oci8Abstract
             $code = (int)$matches[1];
             }
           }
-        
-        throw new Oci8Exception($message, $code, $severity, $file, $line);
+        throw new Oci8Exception($message);
       };
       }
     

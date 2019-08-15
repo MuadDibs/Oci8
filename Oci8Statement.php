@@ -104,9 +104,10 @@ class Oci8Statement extends Oci8Abstract
    */
   public function execute($mode = OCI_COMMIT_ON_SUCCESS)
     {
-    set_error_handler(static::getErrorHandler());
-    $isSuccess = oci_execute($this->statement, $mode);
-    restore_error_handler();
+    //set_error_handler(static::getErrorHandler());
+    $isSuccess = @oci_execute($this->statement, $mode);
+    //return $this->throwExceptionIfFalse($isSuccess, $this->statement);
+    //restore_error_handler();
     return $isSuccess;
     }
   

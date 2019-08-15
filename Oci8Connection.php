@@ -122,6 +122,7 @@ class Oci8Connection extends Oci8Abstract
    * @return array|bool
    * @see http://php.net/manual/en/function.oci-error.php
    */
+  /*FIXME
   public function getError()
     {
     set_error_handler($this->getErrorHandler());
@@ -129,7 +130,7 @@ class Oci8Connection extends Oci8Abstract
     restore_error_handler();
     return $error;
     }
-  
+  */
   /**
    * Allocates new collection object
    *
