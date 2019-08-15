@@ -13,10 +13,14 @@ abstract class Oci8Abstract
       {
       $error = error_get_last();
       }
-    $error = error_get_last();
     return $error;
     }
   
+  /**
+   * @param      $result
+   * @param null $resource
+   * @throws Oci8Exception
+   */
   protected function throwExceptionIfFalse($result, $resource = null)
     {
     if (false === $result || $result === null)
@@ -26,30 +30,6 @@ abstract class Oci8Abstract
       }
     }
   
-  /*
-  protected function throwExceptionIfFalse($result, $handle = null)
-    {
-    if (false === $result || $result === null)
-      {
-      $error = $this->getError($handle);
-      throw new Oci8Exception($error);
-      }
-    
-    return $this;
-    }
-  */
-  /*
-    public function getError()
-      {
-      set_error_handler($this->getErrorHandler());
-      $error = oci_error($this->resource);
-      restore_error_handler();
-      return $error;
-      }*/
-  
-  /**
-   * @return callable
-   */
   protected static function getErrorHandler()
     {
     if (!static::$errorHandler)

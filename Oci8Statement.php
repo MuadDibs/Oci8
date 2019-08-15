@@ -42,9 +42,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function bindArrayByName($name, &$varArray, $maxTableLength, $maxItemLength = -1, $type = SQLT_AFC)
     {
-    set_error_handler(static::getErrorHandler());
     $isSuccess = oci_bind_array_by_name($this->statement, $name, $varArray, $maxTableLength, $maxItemLength, $type);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($isSuccess, $this->statement);
+    
     return $isSuccess;
     }
   
@@ -61,9 +61,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR)
     {
-    set_error_handler(static::getErrorHandler());
     $isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($isSuccess, $this->statement);
+    
     return $isSuccess;
     }
   
@@ -104,10 +104,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function execute($mode = OCI_COMMIT_ON_SUCCESS)
     {
-    //set_error_handler(static::getErrorHandler());
     $isSuccess = @oci_execute($this->statement, $mode);
-    //return $this->throwExceptionIfFalse($isSuccess, $this->statement);
-    //restore_error_handler();
+    $this->throwExceptionIfFalse($isSuccess, $this->statement);
+    
     return $isSuccess;
     }
   
@@ -134,9 +133,9 @@ class Oci8Statement extends Oci8Abstract
       $flags = OCI_FETCHSTATEMENT_BY_COLUMN | OCI_ASSOC;
       }
     
-    set_error_handler(static::getErrorHandler());
     $numRows = oci_fetch_all($this->statement, $output, $skip, $maxRows, $flags);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($numRows, $this->statement);
+    
     return $numRows;
     }
   
@@ -150,9 +149,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function fetchArray($mode = OCI_BOTH)
     {
-    set_error_handler(static::getErrorHandler());
     $row = oci_fetch_array($this->statement, $mode);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($row, $this->statement);
+    
     return $row;
     }
   
@@ -165,9 +164,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function fetchAssoc()
     {
-    set_error_handler(static::getErrorHandler());
     $row = oci_fetch_assoc($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($row, $this->statement);
+    
     return $row;
     }
   
@@ -180,9 +179,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function fetchObject()
     {
-    set_error_handler(static::getErrorHandler());
     $row = oci_fetch_object($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($row, $this->statement);
+    
     return $row;
     }
   
@@ -195,9 +194,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function fetchRow()
     {
-    set_error_handler(static::getErrorHandler());
     $row = oci_fetch_row($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($row, $this->statement);
+    
     return $row;
     }
   
@@ -210,9 +209,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function fetch()
     {
-    set_error_handler(static::getErrorHandler());
     $isSuccess = oci_fetch($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($isSuccess, $this->statement);
+    
     return $isSuccess;
     }
   
@@ -260,9 +259,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function getNumFields()
     {
-    set_error_handler(static::getErrorHandler());
     $numFields = oci_num_fields($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($numFields, $this->statement);
+    
     return $numFields;
     }
   
@@ -275,9 +274,9 @@ class Oci8Statement extends Oci8Abstract
    */
   public function getNumRows()
     {
-    set_error_handler(static::getErrorHandler());
     $numRows = oci_num_rows($this->statement);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($numRows, $this->statement);
+    
     return $numRows;
     }
   
