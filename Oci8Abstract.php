@@ -30,6 +30,7 @@ abstract class Oci8Abstract
       }
     }
   
+  //TODO remove me!
   protected static function getErrorHandler()
     {
     if (!static::$errorHandler)

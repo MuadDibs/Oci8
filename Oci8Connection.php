@@ -117,21 +117,6 @@ class Oci8Connection extends Oci8Abstract
     }
   
   /**
-   * Returns the last error found
-   *
-   * @return array|bool
-   * @see http://php.net/manual/en/function.oci-error.php
-   */
-  /*FIXME
-  public function getError()
-    {
-    set_error_handler($this->getErrorHandler());
-    $error = oci_error($this->connection);
-    restore_error_handler();
-    return $error;
-    }
-  */
-  /**
    * Allocates new collection object
    *
    * @param string $tdo
@@ -207,9 +192,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function parse($sqlText): Oci8Statement
     {
-    set_error_handler(static::getErrorHandler());
     $resource = oci_parse($this->connection, $sqlText);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($resource, $this->connection);
+    
     return new Oci8Statement($resource);
     }
   

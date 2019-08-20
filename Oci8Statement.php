@@ -133,7 +133,7 @@ class Oci8Statement extends Oci8Abstract
       $flags = OCI_FETCHSTATEMENT_BY_COLUMN | OCI_ASSOC;
       }
     
-    $numRows = oci_fetch_all($this->statement, $output, $skip, $maxRows, $flags);
+    $numRows = @oci_fetch_all($this->statement, $output, $skip, $maxRows, $flags);
     $this->throwExceptionIfFalse($numRows, $this->statement);
     
     return $numRows;
