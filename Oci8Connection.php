@@ -61,9 +61,8 @@ class Oci8Connection extends Oci8Abstract
    */
   public function commit()
     {
-    set_error_handler(static::getErrorHandler());
     $isSuccess = oci_commit($this->connection);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($isSuccess, $this->connection);
     return $isSuccess;
     }
   
