@@ -285,7 +285,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-commit.php
    */
-  public function commit()
+  public function commit() : bool
     {
     $isSuccess = oci_commit($this->connection);
     $this->throwExceptionIfFalse($isSuccess, $this->connection);
@@ -300,8 +300,11 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-rollback.php
    */
-  public function rollback()
+  public function rollback() : bool
     {
-
+    $isSuccess = oci_rollback($this->connection);
+    $this->throwExceptionIfFalse($isSuccess, $this->connection);
+    $this->transactionOngoing = false;
+    return $isSuccess;
     }
   }
