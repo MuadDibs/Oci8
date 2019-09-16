@@ -126,7 +126,10 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getNewCursor()
     {
-
+    //TODO finish me
+    $cursor = oci_new_cursor($this->connection);
+    $this->throwExceptionIfFalse($cursor, $this->connection);
+    return $cursor;
     }
 
   /**
@@ -284,7 +287,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-commit.php
    */
-  public function commit() : bool
+  public function commit(): bool
     {
     $isSuccess = oci_commit($this->connection);
     $this->throwExceptionIfFalse($isSuccess, $this->connection);
@@ -299,7 +302,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-rollback.php
    */
-  public function rollback() : bool
+  public function rollback(): bool
     {
     $isSuccess = oci_rollback($this->connection);
     $this->throwExceptionIfFalse($isSuccess, $this->connection);
