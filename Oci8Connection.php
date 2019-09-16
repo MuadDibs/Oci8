@@ -5,7 +5,8 @@ namespace modules\Oci8;
 class Oci8Connection extends Oci8Abstract
   {
   private $connection;
-  
+  private $transactionOngoing = false;
+
   /**
    * Connection constructor.
    * @param      $username
@@ -19,7 +20,7 @@ class Oci8Connection extends Oci8Abstract
     {
     $this->connect($username, $password, $connectionString, $characterSet, $sessionMode);
     }
-  
+
   /**
    * Connect to the Oracle server using a unique connection
    *
@@ -27,7 +28,7 @@ class Oci8Connection extends Oci8Abstract
    * @param string $password
    * @param string $connectionString
    * @param string $characterSet
-   * @param int    $sessionMode
+   * @param int $sessionMode
    * @return Oci8Connection
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-new-connect.php
@@ -39,7 +40,7 @@ class Oci8Connection extends Oci8Abstract
     restore_error_handler();
     return $this;
     }
-  
+
   /**
    * Closes an Oracle connection
    *
@@ -49,23 +50,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function close(): bool
     {
-    
+
     }
-  
-  /**
-   * Commits the outstanding database transaction
-   *
-   * @return bool
-   * @throws Oci8Exception
-   * @see http://php.net/manual/en/function.oci-commit.php
-   */
-  public function commit()
-    {
-    $isSuccess = oci_commit($this->connection);
-    $this->throwExceptionIfFalse($isSuccess, $this->connection);
-    return $isSuccess;
-    }
-  
+
   /**
    * Copies large object
    *
@@ -80,7 +67,7 @@ class Oci8Connection extends Oci8Abstract
     {
 
     }
-  
+
   /**
    * Frees a descriptor
    *
@@ -91,9 +78,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function freeDescriptor($descriptor)
     {
-    
+
     }
-  
+
   /**
    * Returns the Oracle client library mayor version
    *
@@ -101,9 +88,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getClientMayorVersion()
     {
-    
+
     }
-  
+
   /**
    * Returns the Oracle client library version
    *
@@ -112,9 +99,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getClientVersion()
     {
-    
+
     }
-  
+
   /**
    * Allocates new collection object
    *
@@ -131,7 +118,7 @@ class Oci8Connection extends Oci8Abstract
     restore_error_handler();
     return $collection;
     }
-  
+
   /**
    * Allocates and returns a new cursor (statement handle)
    *
@@ -140,9 +127,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getNewCursor()
     {
-    
+
     }
-  
+
   /**
    * Initializes a new empty LOB or FILE descriptor
    *
@@ -153,9 +140,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getNewDescriptor($type = OCI_DTYPE_LOB)
     {
-    
+
     }
-  
+
   /**
    * Returns the Oracle Database version
    *
@@ -165,9 +152,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getServerVersion()
     {
-    
+
     }
-  
+
   /**
    * Compares two LOB/FILE locators for equality
    *
@@ -179,24 +166,26 @@ class Oci8Connection extends Oci8Abstract
    */
   public function isLobEqual($lob1, $lob2)
     {
-    
+
     }
-  
+
   /**
    * Prepares an Oracle statement for execution
    *
    * @param string $sqlText
    * @return Oci8Statement
    * @throws Oci8Exception
+   * @throws \Exception
    */
   public function parse($sqlText): Oci8Statement
     {
     $resource = oci_parse($this->connection, $sqlText);
     $this->throwExceptionIfFalse($resource, $this->connection);
-    
-    return new Oci8Statement($resource);
+
+    return new Oci8Statement($resource,
+      ($this->transactionOngoing) ? OCI_NO_AUTO_COMMIT : OCI_COMMIT_ON_SUCCESS);
     }
-  
+
   /**
    * Sets the action name
    *
@@ -207,9 +196,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function setAction($actionName)
     {
-    
+
     }
-  
+
   /**
    * Sets the client identifier
    *
@@ -220,9 +209,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function setClientIdentifier($clientIdentifier)
     {
-    
+
     }
-  
+
   /**
    * Sets the client information
    *
@@ -231,6 +220,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-set-client-info.php
    */
+  //TODO maybe change to module name. Дабы видеть в v$sql
   public function setClientInfo(string $clientInfo): bool
     {
     set_error_handler(static::getErrorHandler());
@@ -238,7 +228,7 @@ class Oci8Connection extends Oci8Abstract
     restore_error_handler();
     return $isSuccess;
     }
-  
+
   /**
    * Sets the database edition
    *
@@ -249,9 +239,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public static function setEdition($edition)
     {
-    
+
     }
-  
+
   /**
    * Enables or disables internal debug output
    *
@@ -260,9 +250,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function setInternalDebug($onOff)
     {
-    
+
     }
-  
+
   /**
    * Sets the module name
    *
@@ -273,9 +263,36 @@ class Oci8Connection extends Oci8Abstract
    */
   public function setModuleName($moduleName)
     {
-    
+
     }
-  
+
+  /**
+   * Starts virtual transaction
+   * All queries launched after that will use OCI_
+   *
+   * @return bool
+   */
+  public function transactionStart(): bool
+    {
+    $this->transactionOngoing = true;
+    return true;
+    }
+
+  /**
+   * Commits the outstanding database transaction
+   *
+   * @return bool
+   * @throws Oci8Exception
+   * @see http://php.net/manual/en/function.oci-commit.php
+   */
+  public function commit()
+    {
+    $isSuccess = oci_commit($this->connection);
+    $this->throwExceptionIfFalse($isSuccess, $this->connection);
+    $this->transactionOngoing = false;
+    return $isSuccess;
+    }
+
   /**
    * Rolls back the outstanding database transaction
    *
@@ -285,6 +302,6 @@ class Oci8Connection extends Oci8Abstract
    */
   public function rollback()
     {
-    
+
     }
   }

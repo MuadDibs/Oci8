@@ -40,7 +40,7 @@ class Oci8Exception extends \ErrorException
       : 'Unknown Oracle error';
     */
     //FIXME finish message/params/code/filename stuff
-    parent::__construct($message, $code, 1, null, $this->sqlOffset);
+    parent::__construct($message, $code, 1, 'sql', null);
     }
   
   public function getSqlText()
