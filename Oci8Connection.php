@@ -270,7 +270,7 @@ class Oci8Connection extends Oci8Abstract
 
   /**
    * Starts virtual transaction
-   * All queries launched after that will use OCI_
+   * All queries launched after that will use OCI_NO_AUTO_COMMIT by default
    *
    * @return bool
    */
