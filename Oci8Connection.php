@@ -113,9 +113,8 @@ class Oci8Connection extends Oci8Abstract
    */
   public function getNewCollection($collectionName, $schema = 'SYS'): \OCI_Collection
     {
-    set_error_handler(static::getErrorHandler());
     $collection = oci_new_collection($this->connection, $collectionName, $schema);
-    restore_error_handler();
+    $this->throwExceptionIfFalse($collection, $this->connection);
     return $collection;
     }
 
