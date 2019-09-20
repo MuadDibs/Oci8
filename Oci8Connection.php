@@ -16,7 +16,7 @@ class Oci8Connection extends Oci8Abstract
    * @param null $sessionMode
    * @throws Oci8Exception
    */
-  public function __construct($username, $password, $connectionString = null, $characterSet = null, $sessionMode = null)
+  public function __construct($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null)
     {
     $this->connect($username, $password, $connectionString, $characterSet, $sessionMode);
     }
@@ -33,7 +33,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-new-connect.php
    */
-  public function connect($username, $password, $connectionString = null, $characterSet = null, $sessionMode = null): Oci8Connection
+  public function connect($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null): Oci8Connection
     {
     set_error_handler(static::getErrorHandler());
     $this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, $sessionMode);
