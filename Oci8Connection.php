@@ -1,6 +1,6 @@
 <?php
 
-namespace modules\Oci8;
+namespace Oci8;
 
 class Oci8Connection extends Oci8Abstract
   {
@@ -51,7 +51,7 @@ class Oci8Connection extends Oci8Abstract
    * @throws Oci8Exception
    * @see http://php.net/manual/en/function.oci-close.php
    */
-  public function close(): bool
+  public function close()
     {
 
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace modules\Oci8;
+namespace Oci8;
 
 class Oci8Exception extends \ErrorException
   {
@@ -8,7 +8,7 @@ class Oci8Exception extends \ErrorException
   protected $sqlOffset;
   protected $sqlParams;
   protected $sqlTrace;
-  
+
   /**
    * @param array  $error массив, возвращаемый функцией oci_error
    * @param array  $params параметры sql-запроса
@@ -21,17 +21,17 @@ class Oci8Exception extends \ErrorException
                'message' => 'Unknown Oracle error',
                'sqltext' => 'No SQL query',
                'offset' => 0];
-    
+
     $this->sqlParams = $params;
     $this->sqlText = $error['sqltext'];
     $this->sqlOffset = $error['offset'];
-    
+
     # Преобразовываем оракловую трассировку в   массив
     $this->sqlTrace = explode("\n", $error['message']);
 
     # Заполняем стандартные поля класса Exception
     $code = $error['code'];
-    
+
     $message=$error['message'].PHP_EOL.
              'SQL: '.$this->sqlText;
     /*
@@ -42,22 +42,22 @@ class Oci8Exception extends \ErrorException
     //FIXME finish message/params/code/filename stuff
     parent::__construct($message, $code, 1, 'sql', null);
     }
-  
+
   public function getSqlText()
     {
     return trim($this->sqlText);
     }
-  
+
   public function getSqlOffset()
     {
     return $this->sqlOffset;
     }
-  
+
   public function getSqlParams()
     {
     return $this->sqlParams;
     }
-  
+
   public function getSqlTrace()
     {
     return $this->sqlTrace;

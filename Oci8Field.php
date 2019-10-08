@@ -1,6 +1,6 @@
 <?php
 
-namespace modules\Oci8;
+namespace Oci8;
 
 class Oci8Field
   {
@@ -11,7 +11,7 @@ class Oci8Field
   private $size;
   private $type;
   private $value; //TODO REMOVE
-  
+
   public function __construct($name, $value, $size, $precision, $scale, $type, $rawType)
     {
     $this->name = $name;

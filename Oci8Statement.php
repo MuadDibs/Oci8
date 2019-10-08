@@ -1,6 +1,6 @@
 <?php
 
-namespace modules\Oci8;
+namespace Oci8;
 
 class Oci8Statement extends Oci8Abstract
   {
