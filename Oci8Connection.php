@@ -279,8 +279,15 @@ class Oci8Connection extends Oci8Abstract
    */
   public function transactionStart(): bool
     {
-    $this->transactionOngoing = true;
-    return true;
+    if ($this->transactionOngoing===false)
+			{
+			$this->transactionOngoing = true;
+			return true;
+			}
+    else
+			{
+			return false;
+			}
     }
 
   /**
