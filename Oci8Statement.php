@@ -146,7 +146,7 @@ class Oci8Statement extends Oci8Abstract
 		{
 		if (empty($flags))
 			{
-			$flags = OCI_FETCHSTATEMENT_BY_COLUMN | OCI_ASSOC;
+			$flags = OCI_FETCHSTATEMENT_BY_ROW + OCI_ASSOC;
 			}
 
 		$numRows = @oci_fetch_all($this->statement, $output, $skip, $maxRows, $flags);
