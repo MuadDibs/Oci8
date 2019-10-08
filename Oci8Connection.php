@@ -35,6 +35,9 @@ class Oci8Connection extends Oci8Abstract
    */
   public function connect($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null): Oci8Connection
     {
+    //$sql = "ALTER SESSION SET NLS_DATE_FORMAT='DD.MM.YYYY'";
+    //$sql = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='. '";
+
     set_error_handler(static::getErrorHandler());
     $this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, $sessionMode);
     restore_error_handler();
@@ -308,5 +311,13 @@ class Oci8Connection extends Oci8Abstract
     $this->throwExceptionIfFalse($isSuccess, $this->connection);
     $this->transactionOngoing = false;
     return $isSuccess;
+    }
+
+  /**
+   * @throws Oci8Exception
+   */
+  public function __destruct()
+    {
+    $this->close();
     }
   }
