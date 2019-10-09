@@ -27,7 +27,7 @@ class Oci8Statement extends Oci8Abstract
 	 * @param $defaultExecutionMode
 	 * @throws \Exception
 	 */
-	public function __construct($statement, $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS, $connection = null)
+	public function __construct($statement, $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS, Oci8Connection $connection = null)
 		{
 		if (!is_resource($statement) || get_resource_type($statement) !== 'oci8 statement')
 			{
@@ -50,12 +50,13 @@ class Oci8Statement extends Oci8Abstract
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-array-by-name.php
 	 */
-	public function bindArrayByName($name, &$varArray, $maxTableLength, $maxItemLength = -1, $type = SQLT_AFC)
+	public function bindArrayByName($name, &$varArray, $maxTableLength, $maxItemLength = -1, $type = SQLT_AFC) : Oci8Statement
 		{
 		$isSuccess = oci_bind_array_by_name($this->statement, $name, $varArray, $maxTableLength, $maxItemLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
 
-		return $isSuccess;
+		//return $isSuccess;
+		return $this;
 		}
 
 	/**
@@ -69,17 +70,19 @@ class Oci8Statement extends Oci8Abstract
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-by-name.php
 	 */
-	public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR)
+	public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR) : Oci8Statement
 		{
 		$isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
 
-		return $isSuccess;
+		//return $isSuccess;
+		return $this;
 		}
 
-	public function bind()
+	public function bind(array $params) : Oci8Statement
 		{
 		//TODO implement universal bind
+		return $this;
 		}
 
 	/**
@@ -324,8 +327,17 @@ class Oci8Statement extends Oci8Abstract
 
 		}
 
-	public function setCursor($paramName): bool
+	/**
+	 * Bind new cursor to param name
+	 * @param $paramName
+	 * @return bool
+	 * @throws Oci8Exception
+	 */
+	public function setCursor($paramName): Oci8Statement
 		{
-
+		$this->cursor = $this->connection->getNewCursor();
+		$this->bindByName($paramName, $this->cursor, -1, OCI_B_CURSOR);
+		//return true;
+		return $this;
 		}
 	}
