@@ -52,9 +52,13 @@ class Oci8Connection extends Oci8Abstract
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-close.php
 	 */
-	public function close()
+	public function close() : bool
 		{
+		$result = @oci_close($this->connection);
+		$this->throwExceptionIfFalse($result, $this->connection);
+		$this->connection = null;
 
+		return true;
 		}
 
 	/**
