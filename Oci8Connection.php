@@ -241,9 +241,8 @@ class Oci8Connection extends Oci8Abstract
 	//TODO maybe change to module name. Дабы видеть в v$sql
 	public function setClientInfo(string $clientInfo): bool
 		{
-		set_error_handler(static::getErrorHandler());
 		$isSuccess = oci_set_client_info($this->connection, $clientInfo);
-		restore_error_handler();
+		$this->throwExceptionIfFalse($isSuccess, $this->connection);
 		return $isSuccess;
 		}
 
