@@ -50,7 +50,7 @@ class Oci8Statement extends Oci8Abstract
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-array-by-name.php
 	 */
-	public function bindArrayByName($name, &$varArray, $maxTableLength, $maxItemLength = -1, $type = SQLT_AFC) : Oci8Statement
+	public function bindArrayByName($name, &$varArray, $maxTableLength, $maxItemLength = -1, $type = SQLT_AFC): Oci8Statement
 		{
 		$isSuccess = oci_bind_array_by_name($this->statement, $name, $varArray, $maxTableLength, $maxItemLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
@@ -70,7 +70,7 @@ class Oci8Statement extends Oci8Abstract
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-by-name.php
 	 */
-	public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR) : Oci8Statement
+	public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR): Oci8Statement
 		{
 		$isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
@@ -79,7 +79,7 @@ class Oci8Statement extends Oci8Abstract
 		return $this;
 		}
 
-	public function bind(array $params) : Oci8Statement
+	public function bind(array $params): Oci8Statement
 		{
 		//TODO implement universal bind
 		return $this;
@@ -128,6 +128,12 @@ class Oci8Statement extends Oci8Abstract
 			}
 		$isSuccess = @oci_execute($this->statement, $mode);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
+
+		if ($this->cursor)
+			{
+			oci_execute($this->cursor, OCI_DEFAULT);
+			}
+
 
 		return $isSuccess;
 		}
@@ -307,7 +313,7 @@ class Oci8Statement extends Oci8Abstract
 	 *
 	 * @param int $rows
 	 * @return bool
-	 * @throws ci8Exception
+	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-prefetch.php
 	 */
 	public function setPrefetch($rows)
