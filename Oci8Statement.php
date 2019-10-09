@@ -134,7 +134,7 @@ class Oci8Statement extends Oci8Abstract
 			oci_execute($this->cursor, OCI_DEFAULT);
 			}
 
-
+		$this->executed = true;
 		return $isSuccess;
 		}
 
