@@ -6,7 +6,6 @@ class Oci8Connection extends Oci8Abstract
 	{
 	private $connection;
 	private $transactionOngoing = false;
-	private $collections        = [];
 
 	/**
 	 * Connection constructor.
