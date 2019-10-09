@@ -132,7 +132,6 @@ class Oci8Connection extends Oci8Abstract
 		{
 		$collection = oci_new_collection($this->connection, $collectionName, $schema);
 		$this->throwExceptionIfFalse($collection, $this->connection);
-		$this->collections[] = $collection;
 		return $collection;
 		}
 
