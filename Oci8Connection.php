@@ -300,7 +300,7 @@ class Oci8Connection extends Oci8Abstract
 		else
 			{
 			return false;
-			//TODO add expection?
+			//TODO add exception?
 			}
 		}
 
