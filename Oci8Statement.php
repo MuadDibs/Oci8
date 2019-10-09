@@ -4,10 +4,12 @@ namespace Oci8;
 
 class Oci8Statement extends Oci8Abstract
 	{
+	private $connection;
 	private $statement;
 	private $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS;
 	//
 	private $params = [];
+	private $cursor = null;
 	//
 	private $executed  = false;
 	private $described = false;
@@ -25,7 +27,7 @@ class Oci8Statement extends Oci8Abstract
 	 * @param $defaultExecutionMode
 	 * @throws \Exception
 	 */
-	public function __construct($statement, $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS)
+	public function __construct($statement, $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS, $connection = null)
 		{
 		if (!is_resource($statement) || get_resource_type($statement) !== 'oci8 statement')
 			{
@@ -33,6 +35,7 @@ class Oci8Statement extends Oci8Abstract
 			}
 		$this->statement = $statement;
 		$this->defaultExecutionMode = $defaultExecutionMode;
+		if ($connection !== null) $this->connection = $connection;
 		}
 
 	/**
@@ -317,6 +320,11 @@ class Oci8Statement extends Oci8Abstract
 	 * @see http://php.net/manual/en/function.oci-statement-type.php
 	 */
 	public function getType()
+		{
+
+		}
+
+	public function setCursor($paramName): bool
 		{
 
 		}

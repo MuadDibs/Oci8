@@ -201,7 +201,8 @@ class Oci8Connection extends Oci8Abstract
 		$this->throwExceptionIfFalse($resource, $this->connection);
 
 		return new Oci8Statement($resource,
-														 ($this->transactionOngoing) ? OCI_NO_AUTO_COMMIT : OCI_COMMIT_ON_SUCCESS);
+														 ($this->transactionOngoing) ? OCI_NO_AUTO_COMMIT : OCI_COMMIT_ON_SUCCESS,
+														 $this->connection);
 		}
 
 	/**
