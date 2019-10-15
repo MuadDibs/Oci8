@@ -35,10 +35,11 @@ class Oci8Exception extends \ErrorException
 		$message = 'Error Code    : ' . $code . PHP_EOL .
 			         'Error Message : ' . $error['message'] . PHP_EOL .
 			         'Position      : ' . $this->sqlOffset . PHP_EOL .
-			         'Statement     : ' . $this->sqlText . PHP_EOL .
+			         'Statement     : ' . $this->sqlText . PHP_EOL;
+		/*
 			         'Bindings      : ['. print_r($params) . ']' . PHP_EOL .
-			         'Trace         : ' . $this->sqlTrace;
-
+			         'Trace         : ' . print_r($this->sqlTrace);
+*/
 
 		parent::__construct($message, $code);
 		}

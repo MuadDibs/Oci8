@@ -8,8 +8,8 @@ class Oci8Statement extends Oci8Abstract
 	private $statement;
 	private $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS;
 	//
-	private $params = [];
-	private $cursor = null;
+	private $params  = [];
+	private $cursors = [];
 	//
 	private $executed  = false;
 	private $described = false;
@@ -72,9 +72,12 @@ class Oci8Statement extends Oci8Abstract
 	 */
 	public function bindByName($bvName, $variable, $maxLength = -1, $type = SQLT_CHR): Oci8Statement
 		{
+		if (substr($bvName, 0, 1)!==':') $bvName=':'.$bvName;
+
 		$isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
 
+		$this->params[]=[$bvName => $variable];
 		//return $isSuccess;
 		return $this;
 		}
@@ -129,9 +132,9 @@ class Oci8Statement extends Oci8Abstract
 		$isSuccess = @oci_execute($this->statement, $mode);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
 
-		if ($this->cursor)
+		foreach ($this->cursors as &$cursor)
 			{
-			oci_execute($this->cursor, OCI_DEFAULT);
+			oci_execute($cursor, OCI_DEFAULT);
 			}
 
 		$this->executed = true;
@@ -341,8 +344,11 @@ class Oci8Statement extends Oci8Abstract
 	 */
 	public function setCursor($paramName): Oci8Statement
 		{
-		$this->cursor = $this->connection->getNewCursor();
-		$this->bindByName($paramName, $this->cursor, -1, OCI_B_CURSOR);
+		$cursor = $this->connection->getNewCursor();
+		$this->cursors[] = $cursor;
+		//SQLT_RSET
+		//OCI_B_CURSOR
+		$this->bindByName($paramName, $cursor, -1, SQLT_RSET);
 		//return true;
 		return $this;
 		}

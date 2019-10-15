@@ -26,7 +26,7 @@ abstract class Oci8Abstract
     if (false === $result || $result === null)
       {
       $error = $this->getError($resource);
-      throw new Oci8Exception($error);
+      throw new Oci8Exception($error); //add params
       }
     }
 
