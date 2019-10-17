@@ -9,11 +9,13 @@ class Oci8Connection extends Oci8Abstract
 
 	/**
 	 * Connection constructor.
+	 *
 	 * @param      $username
 	 * @param      $password
 	 * @param null $connectionString
 	 * @param null $characterSet
 	 * @param null $sessionMode
+	 *
 	 * @throws Oci8Exception
 	 */
 	public function __construct($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null)
@@ -28,7 +30,8 @@ class Oci8Connection extends Oci8Abstract
 	 * @param string $password
 	 * @param string $connectionString
 	 * @param string $characterSet
-	 * @param int $sessionMode
+	 * @param int    $sessionMode
+	 *
 	 * @return Oci8Connection
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-new-connect.php
@@ -76,6 +79,7 @@ class Oci8Connection extends Oci8Abstract
 	 * @param \OCI-Lob $lobTo
 	 * @param \OCI-Lob $lobFrom
 	 * @param int $length
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-lob-copy.php
@@ -89,6 +93,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Frees a descriptor
 	 *
 	 * @param resource $descriptor
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-free-descriptor.php
@@ -124,6 +129,7 @@ class Oci8Connection extends Oci8Abstract
 	 *
 	 * @param string $tdo
 	 * @param string $schema
+	 *
 	 * @return \OCI_Collection
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-new-collection.php
@@ -152,6 +158,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Initializes a new empty LOB or FILE descriptor
 	 *
 	 * @param int $type
+	 *
 	 * @return \OCI_Lob
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-new-descriptor.php
@@ -178,6 +185,7 @@ class Oci8Connection extends Oci8Abstract
 	 *
 	 * @param \OCI-Lob $lob1
 	 * @param \OCI-Lob $lob2
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-lob-is-equal.php
@@ -191,6 +199,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Prepares an Oracle statement for execution
 	 *
 	 * @param string $sqlText
+	 *
 	 * @return Oci8Statement
 	 * @throws Oci8Exception
 	 * @throws \Exception
@@ -209,6 +218,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Sets the action name
 	 *
 	 * @param string $actionName
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-action.php
@@ -222,6 +232,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Sets the client identifier
 	 *
 	 * @param string $clientIdentifier
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-client-identifier.php
@@ -235,6 +246,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Sets the client information
 	 *
 	 * @param string $clientInfo
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-client-info.php
@@ -251,6 +263,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Sets the database edition
 	 *
 	 * @param string $edition
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-edition.php
@@ -264,6 +277,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Enables or disables internal debug output
 	 *
 	 * @param bool $onOff
+	 *
 	 * @see http://php.net/manual/en/function.oci-internal-debug.php
 	 */
 	public function setInternalDebug($onOff)
@@ -275,6 +289,7 @@ class Oci8Connection extends Oci8Abstract
 	 * Sets the module name
 	 *
 	 * @param string $moduleName
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-module-name.php
@@ -340,5 +355,14 @@ class Oci8Connection extends Oci8Abstract
 	public function __destruct()
 		{
 		$this->close();
+		}
+
+	/**
+	 * Returns connection resource
+	 * @return mixed
+	 */
+	public function getConnection()
+		{
+		return $this->connection;
 		}
 	}
