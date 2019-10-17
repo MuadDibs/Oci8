@@ -14,17 +14,19 @@ class Oci8Statement extends Oci8Abstract
 	private $executed  = false;
 	private $described = false;
 	//TODO remove
-	const EXECUTE_AUTO_COMMIT = 0x02;
-	const EXECUTE_DESCRIBE = 0x01;
+	const EXECUTE_AUTO_COMMIT    = 0x02;
+	const EXECUTE_DESCRIBE       = 0x01;
 	const EXECUTE_NO_AUTO_COMMIT = 0x03;
 	//
 	const RETURN_LOBS_AS_STRING = 0x02;
-	const RETURN_NULLS = 0x01;
+	const RETURN_NULLS          = 0x01;
 
 	/**
 	 * Oci8Statement constructor.
+	 *
 	 * @param $statement
 	 * @param $defaultExecutionMode
+	 *
 	 * @throws \Exception
 	 */
 	public function __construct($statement, $defaultExecutionMode = OCI_COMMIT_ON_SUCCESS, Oci8Connection $connection = null)
@@ -33,7 +35,7 @@ class Oci8Statement extends Oci8Abstract
 			{
 			throw new \Exception('resource is not an oci8 statement');
 			}
-		$this->statement = $statement;
+		$this->statement            = $statement;
 		$this->defaultExecutionMode = $defaultExecutionMode;
 		if ($connection !== null) $this->connection = $connection;
 		}
@@ -42,10 +44,11 @@ class Oci8Statement extends Oci8Abstract
 	 * Binds a PHP array to an Oracle PL/SQL array parameter
 	 *
 	 * @param string $name
-	 * @param array $varArray
-	 * @param int $maxTableLength
-	 * @param int $maxItemLength
-	 * @param int $type
+	 * @param array  $varArray
+	 * @param int    $maxTableLength
+	 * @param int    $maxItemLength
+	 * @param int    $type
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-array-by-name.php
@@ -63,9 +66,10 @@ class Oci8Statement extends Oci8Abstract
 	 * Binds a PHP variable to an Oracle placeholder
 	 *
 	 * @param string $bvName
-	 * @param mixed $variable
-	 * @param int $maxLength
-	 * @param int $type
+	 * @param mixed  $variable
+	 * @param int    $maxLength
+	 * @param int    $type
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-bind-by-name.php
@@ -104,8 +108,9 @@ class Oci8Statement extends Oci8Abstract
 	 * Associates a PHP variable with a column for query fetches
 	 *
 	 * @param string $columnName
-	 * @param mixed $variable
-	 * @param int $type
+	 * @param mixed  $variable
+	 * @param int    $type
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-define-by-name.php
@@ -119,6 +124,7 @@ class Oci8Statement extends Oci8Abstract
 	 * Executes a statement
 	 *
 	 * @param int $mode
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-execute.php
@@ -150,9 +156,10 @@ class Oci8Statement extends Oci8Abstract
 	 * Fetches multiple rows from a query into a two-dimensional array
 	 *
 	 * @param array $output
-	 * @param int $skip
-	 * @param int $maxRows
-	 * @param int $flags
+	 * @param int   $skip
+	 * @param int   $maxRows
+	 * @param int   $flags
+	 *
 	 * @return int
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-fetch-all.php
@@ -164,11 +171,11 @@ class Oci8Statement extends Oci8Abstract
 			$flags = OCI_FETCHSTATEMENT_BY_ROW + OCI_ASSOC;
 			}
 
-		$numRows=$this->executeFetchAll($this->statement, $output, $skip, $maxRows, $flags);
+		$numRows = $this->executeFetchAll($this->statement, $output, $skip, $maxRows, $flags);
 
 		foreach ($this->cursors as $cursorName => $cursor)
 			{
-			$numRows=$this->executeFetchAll($cursor, $output[$cursorName], null, null, $flags);
+			$numRows = $this->executeFetchAll($cursor, $output[$cursorName], null, null, $flags);
 			}
 
 		if ((sizeof($output) < 2) && !empty($output[$cursorName]))
@@ -180,13 +187,14 @@ class Oci8Statement extends Oci8Abstract
 		}
 
 	/**
-	 * @param $output
+	 * @param     $output
 	 * @param int $skip
 	 * @param int $maxRows
 	 * @param int $flags
+	 *
 	 * @throws Oci8Exception
 	 */
-	private function executeFetchAll($statement, &$output, $skip = 0, $maxRows = -1, $flags = 0) : int
+	private function executeFetchAll($statement, &$output, $skip = 0, $maxRows = -1, $flags = 0): int
 		{
 		$numRows = @oci_fetch_all($statement, $output, $skip, $maxRows, $flags);
 		$this->throwExceptionIfFalse($numRows, $this->statement);
@@ -197,6 +205,7 @@ class Oci8Statement extends Oci8Abstract
 	 * Returns the next row from a query as an associative or numeric array
 	 *
 	 * @param int $mode
+	 *
 	 * @return array
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-fetch-array.php
@@ -273,6 +282,7 @@ class Oci8Statement extends Oci8Abstract
 	 * Returns an Oci8Field instance
 	 *
 	 * @param mixed $field
+	 *
 	 * @throws Oci8Exception
 	 */
 	public function getField($field)
@@ -338,13 +348,16 @@ class Oci8Statement extends Oci8Abstract
 	 * Sets number of rows to be prefetched by queries
 	 *
 	 * @param int $rows
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-set-prefetch.php
 	 */
-	public function setPrefetch($rows)
+	public function setPrefetch($rowsCount): Oci8Statement
 		{
-
+		$result = oci_set_prefetch($this->statement, $rowsCount);
+		$this->throwExceptionIfFalse($result);
+		return $this;
 		}
 
 	/**
@@ -361,13 +374,15 @@ class Oci8Statement extends Oci8Abstract
 
 	/**
 	 * Bind new cursor to param name
+	 *
 	 * @param $paramName
+	 *
 	 * @return bool
 	 * @throws Oci8Exception
 	 */
 	public function setCursor($paramName): Oci8Statement
 		{
-		$cursor = $this->connection->getNewCursor();
+		$cursor                    = $this->connection->getNewCursor();
 		$this->cursors[$paramName] = $cursor;
 		//SQLT_RSET
 		//OCI_B_CURSOR
