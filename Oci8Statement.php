@@ -303,8 +303,6 @@ class Oci8Statement extends Oci8Abstract
 			$this->freeCursor($cursor);
 			unset($this->cursors[$cursorName]);
 			}
-
-		exit;
 		return true;
 		}
 
