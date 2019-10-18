@@ -2,6 +2,8 @@
 
 namespace Oci8;
 
+use ReflectionClass;
+
 class Oci8Statement extends Oci8Abstract
 	{
 	private $connection;
@@ -153,53 +155,51 @@ class Oci8Statement extends Oci8Abstract
 		}
 
 	/**
-	 * Fetches multiple rows from a query into a two-dimensional array
+	 * Fetches all data from a query
 	 *
-	 * @param array $output
-	 * @param int   $skip
-	 * @param int   $maxRows
-	 * @param int   $flags
-	 *
-	 * @return int
+	 * @return array
 	 * @throws Oci8Exception
-	 * @see http://php.net/manual/en/function.oci-fetch-all.php
 	 */
-	public function fetchAll(&$output, $skip = 0, $maxRows = -1, $flags = 0): int
+	public function fetchAll(): array
 		{
-		if (empty($flags))
+		$data = [];
+
+		if (sizeof($this->cursors) === 0)
 			{
-			$flags = OCI_FETCHSTATEMENT_BY_ROW + OCI_ASSOC;
+			$data = $this->fetchCursor($this->statement);
 			}
-
-		$numRows = $this->executeFetchAll($this->statement, $output, $skip, $maxRows, $flags);
-
-		foreach ($this->cursors as $cursorName => $cursor)
+		else
 			{
-			$numRows = $this->executeFetchAll($cursor, $output[$cursorName], null, null, $flags);
+			foreach ($this->cursors as $cursorName => $cursor)
+				{
+				$data[$cursorName] = $this->fetchCursor($cursor);
+				}
 			}
-
-		if ((sizeof($output) < 2) && !empty($output[$cursorName]))
+		if ((sizeof($data) < 2) && !empty($data[$cursorName]))
 			{
-			$output = $output[$cursorName];
+			$data = $data[$cursorName];
 			}
-
-		return $numRows;
+		return $data;
 		}
 
 	/**
-	 * @param     $output
-	 * @param int $skip
-	 * @param int $maxRows
-	 * @param int $flags
+	 * Fetches multiple rows data from cursor
 	 *
+	 * @param $cursor
+	 *
+	 * @return array
 	 * @throws Oci8Exception
 	 */
-	private function executeFetchAll($statement, &$output, $skip = 0, $maxRows = -1, $flags = 0): int
+	private function fetchCursor($cursor): array
 		{
-		$numRows = @oci_fetch_all($statement, $output, $skip, $maxRows, $flags);
-		$this->throwExceptionIfFalse($numRows, $this->statement);
-		return $numRows;
+		$data = [];
+		while ($row = $this->fetch($cursor))
+			{
+			$data[] = $row;
+			}
+		return $data;
 		}
+
 
 	/**
 	 * Returns the next row from a query as an associative or numeric array
@@ -264,18 +264,217 @@ class Oci8Statement extends Oci8Abstract
 		}
 
 	/**
-	 * Fetches the next row from a query into internal buffers
+	 * Fetches the next row from a query
 	 *
-	 * @return bool
+	 * @return array|object|null
 	 * @throws Oci8Exception
-	 * @see http://php.net/manual/en/function.oci-fetch.php
 	 */
-	public function fetch()
+	public function fetch($cursor = null, $fetchMode = Oci8::FETCH_OBJ)
 		{
-		$isSuccess = oci_fetch($this->statement);
-		$this->throwExceptionIfFalse($isSuccess, $this->statement);
+		// If not fetchMode was specified, used the default value of or the mode
+		// set by the last call to setFetchMode()
+		/*TODO implement ad add setFetchMode
+		if ($fetchMode === null)
+			{
+			$fetchMode = $this->fetchMode;
+			}
+		*/
+		if ($cursor === null)
+			{
+			$cursor = $this->statement;
+			}
 
-		return $isSuccess;
+		// Convert array keys (or object properties) to lowercase
+		//$toLowercase = ($this->getAttribute(PDO::ATTR_CASE) == PDO::CASE_LOWER);
+		$convertCase = Oci8::CASE_CAMEL;
+		// Convert null value to empty string
+		$nullToString = false; //($this->getAttribute(PDO::ATTR_ORACLE_NULLS) == PDO::NULL_TO_STRING);
+		// Convert empty string to null
+		$nullEmptyString = false; //($this->getAttribute(PDO::ATTR_ORACLE_NULLS) == PDO::NULL_EMPTY_STRING);
+
+		// Determine the fetch mode
+		switch ($fetchMode)
+			{
+			case Oci8::FETCH_BOTH:
+				$rs = oci_fetch_array($cursor); // Fetches both; nice!
+				if ($rs === false)
+					{
+					return false;
+					}
+				if ($convertCase == Oci8::CASE_LOWER)
+					{
+					$rs = array_change_key_case($rs);
+					}
+				/*
+				if ($this->returnLobs && is_array($rs))
+					{
+					foreach ($rs as $field => $value)
+						{
+						if (is_object($value))
+							{
+							$rs[$field] = $this->loadLob($value);
+							}
+						}
+					}
+        */
+				return $rs;
+
+			case Oci8::FETCH_ASSOC:
+				$rs = oci_fetch_assoc($this->fetchStatement);
+
+				if ($rs === false)
+					{
+					return false;
+					}
+				if ($convertCase == Oci8::CASE_LOWER)
+					{
+					$rs = array_change_key_case($rs);
+					}
+				if ($this->returnLobs && is_array($rs))
+					{
+					foreach ($rs as $field => $value)
+						{
+						if (is_object($value))
+							{
+							$rs[$field] = $this->loadLob($value);
+							}
+						}
+					}
+
+				return $rs;
+
+			case Oci8::FETCH_NUM:
+				$rs = oci_fetch_row($cursor);
+				if ($rs === false)
+					{
+					return false;
+					}
+				if ($this->returnLobs && is_array($rs))
+					{
+					foreach ($rs as $field => $value)
+						{
+						if (is_object($value))
+							{
+							$rs[$field] = $this->loadLob($value);
+							}
+						}
+					}
+
+				return $rs;
+
+			case Oci8::FETCH_COLUMN:
+				$rs    = oci_fetch_row($cursor);
+				$colNo = (int)$this->fetchColNo;
+				if (is_array($rs) && array_key_exists($colNo, $rs))
+					{
+					$value = $rs[$colNo];
+					if (is_object($value))
+						{
+						return $this->loadLob($value);
+						}
+
+					return $value;
+					}
+				else
+					{
+					return false;
+					}
+				break;
+
+			//case Oci8::FETCH_INTO:
+			case Oci8::FETCH_OBJ:
+			case Oci8::FETCH_CLASS:
+				$rs = oci_fetch_assoc($cursor);
+				if ($rs === false)
+					{
+					return false;
+					}
+				if ($convertCase == Oci8::CASE_LOWER)
+					{
+					$rs = array_change_key_case($rs);
+					}
+				elseif ($convertCase == Oci8::CASE_CAMEL)
+					{
+					$rs = oci8::camelCaseKeys($rs);
+					}
+
+				//if ($fetchMode === PDO::FETCH_INTO)
+				if (false)
+					{
+					if (is_object($this->fetchIntoObject))
+						{
+						$object = $this->fetchIntoObject;
+						}
+					else
+						{
+						// Object to set into has not been set
+						return false;
+						}
+					}
+				else
+					{
+					if ($fetchMode === Oci8::FETCH_OBJ)
+						{
+						$className = '\stdClass';
+						$ctorargs  = [];
+						}
+					else
+						{
+						$className = $this->fetchClassName;
+						$ctorargs  = $this->fetchCtorArgs;
+						}
+
+					if ($ctorargs)
+						{
+						$reflectionClass = new ReflectionClass($className);
+						$object          = $reflectionClass->newInstanceArgs($ctorargs);
+						}
+					else
+						{
+						$object = new $className();
+						}
+					}
+
+				// Format recordsets values depending on options
+				foreach ($rs as $field => $value)
+					{
+					// convert null to empty string
+					if (is_null($value) && $nullToString)
+						{
+						$rs[$field] = '';
+						}
+
+					// convert empty string to null
+					if (empty($rs[$field]) && $nullEmptyString)
+						{
+						$rs[$field] = null;
+						}
+
+					// convert LOB to string
+					//if ($this->returnLobs && is_object($value))
+					if (false)
+						{
+						$ociFieldIndex = is_int($field) ? $field : array_search($field, array_keys($rs));
+						// oci field type index is base 1.
+						if (oci_field_type($this->sth, $ociFieldIndex + 1) == 'ROWID')
+							{
+							//throw new PDOException('ROWID output is not yet supported. Please use ROWIDTOCHAR(ROWID) function as workaround.');
+							}
+						else
+							{
+							//$object->$field = $this->loadLob($value);
+							}
+						}
+					else
+						{
+						$object->$field = $value;
+						}
+					}
+
+				return $object;
+			}
+
+		return null;
 		}
 
 	/**
