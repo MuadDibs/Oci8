@@ -297,13 +297,18 @@ class Oci8Statement extends Oci8Abstract
 	 */
 	public function free(): bool
 		{
-		$this->freeCursor($this->statement);
+		if ($this->statement === null) return false;
+
+		$isSuccess = $this->freeCursor($this->statement);
 		foreach ($this->cursors as $cursorName => $cursor)
 			{
-			$this->freeCursor($cursor);
+			$isSuccess = $this->freeCursor($cursor) && $isSuccess;
 			unset($this->cursors[$cursorName]);
 			}
-		return true;
+
+		$this->statement = null;
+
+		return $isSuccess;
 		}
 
 	/**
