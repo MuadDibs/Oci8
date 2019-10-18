@@ -291,15 +291,34 @@ class Oci8Statement extends Oci8Abstract
 		}
 
 	/**
+	 * Frees all resources associated with statement and cursors
+	 *
+	 * @return bool
+	 */
+	public function free(): bool
+		{
+		$this->freeCursor($this->statement);
+		foreach ($this->cursors as $cursorName => $cursor)
+			{
+			$this->freeCursor($cursor);
+			unset($this->cursors[$cursorName]);
+			}
+
+		exit;
+		return true;
+		}
+
+	/**
 	 * Frees all resources associated with statement or cursor
 	 *
 	 * @return bool
-	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-free-statement.php
 	 */
-	public function free()
+	private function freeCursor($cursor): bool
 		{
-
+		$isSuccess = @oci_free_statement($cursor);
+		//TODO maybe add error handler
+		return $isSuccess;
 		}
 
 	/**
@@ -384,9 +403,8 @@ class Oci8Statement extends Oci8Abstract
 		{
 		$cursor                    = $this->connection->getNewCursor();
 		$this->cursors[$paramName] = $cursor;
-		//SQLT_RSET
-		//OCI_B_CURSOR
-		$this->bindByName($paramName, $cursor, -1, SQLT_RSET);
+		$this->bindByName($paramName, $cursor, -1, SQLT_RSET); //OCI_B_CURSOR
+
 		//return true;
 		return $this;
 		}
