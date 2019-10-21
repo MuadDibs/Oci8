@@ -2,7 +2,7 @@
 
 namespace Oci8;
 
-class Oci8Connection extends Oci8Abstract
+class Oci8Connection extends Oci8
 	{
 	private $connection;
 	private $transactionOngoing = false;
@@ -41,9 +41,8 @@ class Oci8Connection extends Oci8Abstract
 		//$sql = "ALTER SESSION SET NLS_DATE_FORMAT='DD.MM.YYYY'";
 		//$sql = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='. '";
 
-		set_error_handler(static::getErrorHandler());
 		$this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, $sessionMode);
-		restore_error_handler();
+
 		return $this;
 		}
 
