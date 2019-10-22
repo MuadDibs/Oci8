@@ -80,7 +80,7 @@ class Oci8Statement extends Oci8
 		{
 		if (substr($bvName, 0, 1) !== ':') $bvName = ':' . $bvName;
 
-		$isSuccess = oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
+		$isSuccess = @oci_bind_by_name($this->statement, $bvName, $variable, $maxLength, $type);
 		$this->throwExceptionIfFalse($isSuccess, $this->statement);
 
 		$this->params[] = [$bvName => $variable];
