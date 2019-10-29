@@ -175,7 +175,7 @@ class Oci8Statement extends Oci8
 				$data[$cursorName] = $this->fetchAllCursor($cursor);
 				}
 			}
-		if ((sizeof($data) < 2) && !empty($data[$cursorName]))
+		if ((sizeof($data) < 2) && !empty($cursorName) && !empty($data[$cursorName]))
 			{
 			$data = $data[$cursorName];
 			}
