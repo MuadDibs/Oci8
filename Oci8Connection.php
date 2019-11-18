@@ -40,6 +40,7 @@ class Oci8Connection extends Oci8
 		{
 		//$sql = "ALTER SESSION SET NLS_DATE_FORMAT='DD.MM.YYYY'";
 		//$sql = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='. '";
+		//ALTER SESSION SET NLS_NUMERIC_CHARACTERS = ',.';
 
 		$this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, $sessionMode);
 
