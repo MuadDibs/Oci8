@@ -10,17 +10,22 @@ class Oci8Connection extends Oci8
 	/**
 	 * Connection constructor.
 	 *
-	 * @param      $username
-	 * @param      $password
-	 * @param null $connectionString
-	 * @param null $characterSet
-	 * @param null $sessionMode
+	 * @param string $username
+	 * @param string $password
+	 * @param string $connectionString
+	 * @param string $characterSet
+	 * @param array  $sessionVars
 	 *
 	 * @throws Oci8Exception
 	 */
-	public function __construct($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null)
+	public function __construct(string $username,
+															string $password,
+															?string $connectionString = null,
+															string $characterSet = 'AL32UTF8',
+															array $sessionVars = ['NLS_NUMERIC_CHARACTERS' => '. ',
+																										'NLS_DATE_FORMAT'        => 'YYYY-MM-DD"T"HH24:MI:SS'])
 		{
-		$this->connect($username, $password, $connectionString, $characterSet, $sessionMode);
+		$this->connect($username, $password, $connectionString, $characterSet, $sessionVars);
 		}
 
 	/**
@@ -30,20 +35,27 @@ class Oci8Connection extends Oci8
 	 * @param string $password
 	 * @param string $connectionString
 	 * @param string $characterSet
-	 * @param int    $sessionMode
+	 * @param array  $sessionVars
 	 *
 	 * @return Oci8Connection
 	 * @throws Oci8Exception
 	 * @see http://php.net/manual/en/function.oci-new-connect.php
 	 */
-	public function connect($username, $password, $connectionString = null, $characterSet = 'AL32UTF8', $sessionMode = null): Oci8Connection
+	public function connect(string $username,
+													string $password,
+													?string $connectionString = null,
+													string $characterSet = 'AL32UTF8',
+													array $sessionVars = ['NLS_NUMERIC_CHARACTERS' => '. ',
+																								'NLS_DATE_FORMAT'        => 'YYYY-MM-DD"T"HH24:MI:SS'])
+
 		{
-		//$sql = "ALTER SESSION SET NLS_DATE_FORMAT='DD.MM.YYYY'";
-		//$sql = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='. '";
-		//ALTER SESSION SET NLS_NUMERIC_CHARACTERS = ',.';
+		//NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH:MI:SS.FF';
 
-		$this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, $sessionMode);
-
+		$this->connection = oci_new_connect($username, $password, $connectionString, $characterSet, null);
+		if (count($sessionVars) > 0)
+			{
+			$this->setSessionVars($sessionVars);
+			}
 		return $this;
 		}
 
@@ -364,5 +376,34 @@ class Oci8Connection extends Oci8
 	public function getConnection()
 		{
 		return $this->connection;
+		}
+
+	/**
+	 *
+	 *
+	 * @param array $sessionVars
+	 *
+	 * @return bool
+	 * @throws Oci8Exception
+	 */
+	public function setSessionVars(array $sessionVars)
+		{
+		$vars = [];
+		foreach ($sessionVars as $option => $value)
+			{
+			if (strtoupper($option) == 'CURRENT_SCHEMA')
+				{
+				$vars[] = "$option  = $value";
+				}
+			else
+				{
+				$vars[] = "$option  = '$value'";
+				}
+			}
+		$sql  = "ALTER SESSION SET " . implode(" ", $vars);
+		$stmt = $this->parse($sql);
+		$stmt->execute();
+
+		return true;
 		}
 	}
