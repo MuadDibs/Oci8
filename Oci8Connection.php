@@ -23,7 +23,7 @@ class Oci8Connection extends Oci8
 															?string $connectionString = null,
 															string $characterSet = 'AL32UTF8',
 															array $sessionVars = ['NLS_NUMERIC_CHARACTERS' => '. ',
-																										'NLS_DATE_FORMAT'        => 'YYYY-MM-DD"T"HH24:MI:SS'])
+																										'NLS_DATE_FORMAT'        => 'YYYY-MM-DD HH24:MI:SS'])
 		{
 		$this->connect($username, $password, $connectionString, $characterSet, $sessionVars);
 		}
@@ -46,7 +46,7 @@ class Oci8Connection extends Oci8
 													?string $connectionString = null,
 													string $characterSet = 'AL32UTF8',
 													array $sessionVars = ['NLS_NUMERIC_CHARACTERS' => '. ',
-																								'NLS_DATE_FORMAT'        => 'YYYY-MM-DD"T"HH24:MI:SS'])
+																								'NLS_DATE_FORMAT'        => 'YYYY-MM-DD HH24:MI:SS'])
 
 		{
 		//NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH:MI:SS.FF';
